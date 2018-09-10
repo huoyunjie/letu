@@ -26,7 +26,15 @@ def parse_file_dir_name_without_type(file):
         print('file is not a string')
         return None, None
 
+new_str = 'new'
+easy_str = 'easy'
+familiar_str = 'familiar'
+difficult_str = 'difficult'
+error_str = 'error'
+
+
 class Example(QWidget):
+    pdf_page_num = 0
     def __init__(self):
         super().__init__()
         self.words_path = '../words'
@@ -34,28 +42,34 @@ class Example(QWidget):
 
         self.words_manager_inst = words_manager.WordsManager('../words')
 
-        self.new_dict = self.words_manager_inst.get_words_dict('new')
-        self.new_list = list(self.new_dict.keys())
+        self.new_dict = dict()
+        # old words
+        self.error_dict = dict()
+        self.easy_dict = dict()
+        self.familiar_dict = dict()
+        self.difficult_dict = dict()
 
-        self.error_dict = self.words_manager_inst.get_words_dict('error')
-        self.error_list = list(self.error_dict.keys())
+        self.words_lists = dict()
+        self.words_lists[new_str] = []
+        # new words
+        self.words_lists[error_str] = []
+        self.words_lists[easy_str] = []
+        self.words_lists[familiar_str] = []
+        self.words_lists[difficult_str] = []
 
-        self.easy_dict = self.words_manager_inst.get_words_dict('easy')
-        self.easy_list = list(self.easy_dict.keys())
+        self.words_dicts = dict()
+        self.words_dicts[error_str] = dict()
+        self.words_dicts[easy_str] = dict()
+        self.words_dicts[familiar_str] = dict()
+        self.words_dicts[difficult_str] = dict()
 
-        self.familiar_dict = self.words_manager_inst.get_words_dict('familiar')
-        self.familiar_list = list(self.familiar_dict.keys())
-
-        self.difficult_dict = self.words_manager_inst.get_words_dict('difficult')
-        self.difficult_list = list(self.difficult_dict.keys())
-
-        print(self.new_list)
+        print(self.words_lists[new_str])
 
         self.init_ui()
 
         self.new_index = 0
-        word = self.new_list[0]
-        self.new_words_edit.setText(word)
+
+        self.words_move_history = []
 
     def init_ui(self):
         self.text = "Test function"
@@ -98,15 +112,26 @@ class Example(QWidget):
         btn.resize(btn.sizeHint())
         btn.move(400, 0)
 
+        self.label = QLabel(self)
+        self.label.setText('pdf page number: ')
+        self.label.setFocusPolicy(Qt.NoFocus)
+
+        self.pdf_page_number_edit = QLineEdit(self)
+        self.pdf_page_number_edit.setText('0')
+        self.label.move(30, 60)
+        self.pdf_page_number_edit.move(160, 60)
+
+
         # Add LineEditor
         self.label = QLabel(self)
         self.label.setText('new')
         self.label.setFocusPolicy(Qt.NoFocus)
 
-        self.new_words_edit = QLineEdit(self)
+        self.words_edits = dict()
+        self.words_edits[new_str] = QLineEdit(self)
         # self.new_words_edit.setFocusPolicy(Qt.ClickFocus)
         # self.new_words_edit.setReadOnly(True)
-        self.new_words_edit.move(216, 300)
+        self.words_edits[new_str].move(216, 300)
         self.label.move(216 + 60, 300 - 20)
         # self.new_words_edit.textChanged[str].connect(self.new_line_edit_changed)
 
@@ -114,10 +139,10 @@ class Example(QWidget):
         self.label.setText('error')
         self.label.setFocusPolicy(Qt.NoFocus)
 
-        self.error_words_edit = QLineEdit(self)
+        self.words_edits[error_str] = QLineEdit(self)
         # self.error_words_edit.setFocusPolicy(Qt.ClickFocus)
         # self.error_words_edit.setReadOnly(True)
-        self.error_words_edit.move(216, 300-150)
+        self.words_edits[error_str].move(216, 300-150)
         self.label.move(216 + 60, 280-150)
         # self.error_words_edit.textChanged[str].connect(self.error_line_edit_changed)
 
@@ -125,22 +150,21 @@ class Example(QWidget):
         self.label.setText('easy')
         self.label.setFocusPolicy(Qt.NoFocus)
 
-        self.easy_words_edit = QLineEdit(self)
+        self.words_edits[easy_str] = QLineEdit(self)
         # self.easy_words_edit.setFocusPolicy(Qt.ClickFocus)
         # self.easy_words_edit.setReadOnly(True)
-        self.easy_words_edit.move(216, 300+150)
+        self.words_edits[easy_str].move(216, 300+150)
         self.label.move(216 + 60, 280+150)
         # self.easy_words_edit.textChanged[str].connect(self.easy_line_edit_changed)
-
 
         self.label = QLabel(self)
         self.label.setText('familiar')
         self.label.setFocusPolicy(Qt.NoFocus)
 
-        self.familiar_words_edit = QLineEdit(self)
+        self.words_edits[familiar_str] = QLineEdit(self)
         # self.familiar_words_edit.setFocusPolicy(Qt.ClickFocus)
         # self.familiar_words_edit.setReadOnly(True)
-        self.familiar_words_edit.move(10, 300)
+        self.words_edits[familiar_str].move(10, 300)
         self.label.move(10+60, 300-20)
         # self.familiar_words_edit.textChanged[str].connect(self.familiar_line_edit_changed)
 
@@ -149,51 +173,14 @@ class Example(QWidget):
         self.label.setText('difficult')
         self.label.setFocusPolicy(Qt.NoFocus)
 
-        self.difficult_words_edit = QLineEdit(self)
+        self.words_edits[difficult_str] = QLineEdit(self)
         # self.difficult_words_edit.setFocusPolicy(Qt.ClickFocus)
         # self.difficult_words_edit.setReadOnly(True)
-        self.difficult_words_edit.move(420, 300)
+        self.words_edits[difficult_str].move(420, 300)
         self.label.move(420+60, 300-20)
         # self.difficult_words_edit.textChanged[str].connect(self.difficult_line_edit_changed)
 
         self.work_mode_classify()
-
-        # # Add LineEditor
-        # self.label = QLabel(self)
-        # self.label.setText('word')
-        #
-        # self.new_words_edit = QLineEdit(self)
-        # self.new_words_edit.move(200, 300)
-        # self.label.move(260, 280)
-        # # self.new_words_edit.textChanged[str].connect(self.current_line_edit_changed)
-        #
-        #
-        # self.label = QLabel(self)
-        # self.label.setText('easy')
-        #
-        # line_edit = QLineEdit(self)
-        # line_edit.move(200, 300+150)
-        # self.label.move(260, 280+150)
-        # line_edit.textChanged[str].connect(self.easy_line_edit_changed)
-        #
-        #
-        # self.label = QLabel(self)
-        # self.label.setText('familiar')
-        #
-        # line_edit = QLineEdit(self)
-        # line_edit.move(200-150, 300-150)
-        # self.label.move(260-150, 280-150)
-        # line_edit.textChanged[str].connect(self.familiar_line_edit_changed)
-        #
-        #
-        # self.label = QLabel(self)
-        # self.label.setText('difficult')
-        #
-        # line_edit = QLineEdit(self)
-        # line_edit.move(200+150, 300-150)
-        # self.label.move(260+150, 280-150)
-        # line_edit.textChanged[str].connect(self.difficult_line_edit_changed)
-
 
         # self.des
         self.resize(600, 600)
@@ -207,8 +194,6 @@ class Example(QWidget):
         # self.setAttribute(Qt.WA_TranslucentBackground)
         # 透明度
         # self.setWindowOpacity(0.6)
-
-
 
         self.show()
 
@@ -225,31 +210,35 @@ class Example(QWidget):
         # 检测键盘回车按键，函数名字不要改，这是重写键盘事件
 
     def work_mode_classify(self):
-        self.new_words_edit.setFocusPolicy(Qt.NoFocus)
-        self.new_words_edit.setReadOnly(True)
-        self.error_words_edit.setFocusPolicy(Qt.NoFocus)
-        self.error_words_edit.setReadOnly(True)
-        self.easy_words_edit.setFocusPolicy(Qt.NoFocus)
-        self.easy_words_edit.setReadOnly(True)
-        self.familiar_words_edit.setFocusPolicy(Qt.NoFocus)
-        self.familiar_words_edit.setReadOnly(True)
-        self.difficult_words_edit.setFocusPolicy(Qt.NoFocus)
-        self.difficult_words_edit.setReadOnly(True)
+        self.pdf_page_number_edit.setFocusPolicy(Qt.NoFocus)
+        self.pdf_page_number_edit.setReadOnly(True)
+
+        self.words_edits[new_str].setFocusPolicy(Qt.NoFocus)
+        self.words_edits[new_str].setReadOnly(True)
+        self.words_edits[error_str].setFocusPolicy(Qt.NoFocus)
+        self.words_edits[error_str].setReadOnly(True)
+        self.words_edits[easy_str].setFocusPolicy(Qt.NoFocus)
+        self.words_edits[easy_str].setReadOnly(True)
+        self.words_edits[familiar_str].setFocusPolicy(Qt.NoFocus)
+        self.words_edits[familiar_str].setReadOnly(True)
+        self.words_edits[difficult_str].setFocusPolicy(Qt.NoFocus)
+        self.words_edits[difficult_str].setReadOnly(True)
 
     def work_mode_edit(self):
-        self.new_words_edit.setFocusPolicy(Qt.ClickFocus)
-        self.new_words_edit.setReadOnly(False)
-        self.error_words_edit.setFocusPolicy(Qt.ClickFocus)
-        self.error_words_edit.setReadOnly(True)
-        self.easy_words_edit.setFocusPolicy(Qt.ClickFocus)
-        self.easy_words_edit.setReadOnly(True)
-        self.familiar_words_edit.setFocusPolicy(Qt.ClickFocus)
-        self.familiar_words_edit.setReadOnly(True)
-        self.difficult_words_edit.setFocusPolicy(Qt.ClickFocus)
-        self.difficult_words_edit.setReadOnly(True)
+        self.pdf_page_number_edit.setFocusPolicy(Qt.ClickFocus)
+        self.pdf_page_number_edit.setReadOnly(False)
 
+        self.words_edits[new_str].setFocusPolicy(Qt.ClickFocus)
+        self.words_edits[new_str].setReadOnly(False)
+        self.words_edits[error_str].setFocusPolicy(Qt.ClickFocus)
+        self.words_edits[error_str].setReadOnly(True)
+        self.words_edits[easy_str].setFocusPolicy(Qt.ClickFocus)
+        self.words_edits[easy_str].setReadOnly(True)
+        self.words_edits[familiar_str].setFocusPolicy(Qt.ClickFocus)
+        self.words_edits[familiar_str].setReadOnly(True)
+        self.words_edits[difficult_str].setFocusPolicy(Qt.ClickFocus)
+        self.words_edits[difficult_str].setReadOnly(True)
 
-    # self.work_mode = 'eidt', 'classifiy'
     def work_mode_switch(self):
         if self.work_mode == WORK_MODE_CLASSIFY:
             self.work_mode_edit()
@@ -264,29 +253,28 @@ class Example(QWidget):
         # 这里event.key（）显示的是按键的编码
         print("按下：" + str(event.key()))
         # 举例，这里Qt.Key_A注意虽然字母大写，但按键事件对大小写不敏感
-        if (event.key() == Qt.Key_Tab):
+        if event.key() == Qt.Key_Tab:
             print('Key：Tab')
             self.work_mode_switch()
-        if (event.key() == Qt.Key_W):
+        if event.key() == Qt.Key_W:
             print('Key：Up')
-            word = self.new_words_pop()
-            self.error_words_push(word)
-        if (event.key() == Qt.Key_S):
+            self.word_move_to(error_str)
+        if event.key() == Qt.Key_S:
             print('Key：Down')
-            word = self.new_words_pop()
-            self.easy_words_push(word)
-        if (event.key() == Qt.Key_A):
+            self.word_move_to(easy_str)
+        if event.key() == Qt.Key_A:
             print('Key：Left')
-            word = self.new_words_pop()
-            self.familiar_words_push(word)
-        if (event.key() == Qt.Key_D):
+            self.word_move_to(familiar_str)
+        if event.key() == Qt.Key_D:
             print('Key：Right')
-            word = self.new_words_pop()
-            self.difficult_words_push(word)
+            self.word_move_to(difficult_str)
+        if event.key() == Qt.Key_Backspace:
+            print('Key：Backspace')
+            self.word_move_back(self.words_move_history[-1])
+
         # if (event.key() == Qt.Key_Enter):
         #     print('测试：Space')
-        # if (event.key() == Qt.Key_Backspace):
-        #     print('测试：Space')
+
         # 当需要组合键时，要很多种方式，这里举例为“shift+单个按键”，也可以采用shortcut、或者pressSequence的方法。
         # if (event.key() == Qt.Key_P):
         #     if QApplication.keyboardModifiers() == Qt.ShiftModifier:
@@ -294,8 +282,40 @@ class Example(QWidget):
         #     else:
         #         print("p")
 
+    def word_move_to(self, name):
+        word = self.words_edits[new_str].text()
+        self.words_list_push_end(name, word)
+        self.words_edits[name].setText(word)
+        self.new_index += 1
+        self.words_edits[new_str].setText(self.words_lists[new_str][self.new_index])
+
+        self.words_move_history.append(name)
+
+    def word_move_back(self, name):
+        if self.new_index <= 0:
+            print('[word_move_back] new_index <= 0')
+        else:
+            # print(self.words_lists[name])
+            print('[word_move_back] name: ', name)
+            # print(self.words_list_pop_end(name))
+            # print(self.words_list_pop_end(name))
+            # print(self.words_list_pop_end(name))
+            word = self.words_list_pop_end(name)
+            print('[word_move_back] pop: ', word)
+            self.words_edits[name].setText(self.words_lists[name][-1])
+            print('[word_move_back] set: ', self.words_lists[name][-1])
+            self.new_index -= 1
+            self.words_edits[new_str].setText(self.words_lists[new_str][self.new_index])
+            self.words_move_history.pop()
+
+            print('[word_move_back] new_index: ', self.new_index)
+
     def open_btn(self):
         print('Open button click')
+        page_num_str = self.pdf_page_number_edit.text()
+        self.pdf_page_num = int(page_num_str)
+        print('pdf page number: ', self.pdf_page_num)
+
         file_names, file_type = QFileDialog.getOpenFileNames(self,
                                                              'Select files',
                                                              '',
@@ -308,13 +328,23 @@ class Example(QWidget):
             print('Process pdf file')
             words_file_name = self.pdf2words(file_names, file_type)
             self.filter_words_new(words_file_name)
-            # self.test_display()
+
+            self.new_dict = self.words_manager_inst.get_words_dict(new_str)
+            self.error_dict = self.words_manager_inst.get_words_dict(error_str)
+            self.easy_dict = self.words_manager_inst.get_words_dict(easy_str)
+            self.familiar_dict = self.words_manager_inst.get_words_dict(familiar_str)
+            self.difficult_dict = self.words_manager_inst.get_words_dict(difficult_str)
+
+            self.new_index = 0
+            self.words_lists[new_str] = list(self.new_dict.keys())
+            self.words_edits[new_str].setText(self.words_lists[new_str][self.new_index])
         else:
             print('Can not select pdf file')
 
     def pdf2words(self, file_names, file_type):
         print('[pdf2txt]: Start...')
         file_txt_name_list = []
+
         for file_name in file_names:
             print('[pdf2txt]: ', file_name)
             dir_path, name = parse_file_dir_name_without_type(file_name)
@@ -323,7 +353,10 @@ class Example(QWidget):
 
             # pdf2txt
             file_txt_name = '../temp/' + name + '.txt'
-            pdf2txt_cmd = ['-o', file_txt_name, file_name]
+            if self.pdf_page_num == 0:
+                pdf2txt_cmd = ['-o', file_txt_name, file_name]
+            else:
+                pdf2txt_cmd = ['-m', self.pdf_page_num, '-o', file_txt_name, file_name]
             pdf2txt.process(pdf2txt_cmd)
             file_txt_name_list.append(file_txt_name)
 
@@ -340,36 +373,61 @@ class Example(QWidget):
         print('filter_words_new: ', file_name)
         self.words_manager_inst.generate_new_words(file_name)
 
-    def new_words_pop(self):
-        word = self.new_list[self.new_index]
-        self.new_index += 1
-        self.new_words_edit.setText(self.new_list[self.new_index])
+    # def words_list_pop_head(self, name):
+    #     word = self.words_lists[name].pop(0)
+    #     return word
 
+    def words_list_pop_end(self, name):
+        word = self.words_lists[name].pop(-1)
         return word
 
-    def error_words_push(self, word):
-        self.error_words_edit.setText(word)
-        # word = self.easy_list[self.easyindex]
+    # def words_list_push_head(self, name, word):
+    #     self.words_lists[name].insert(0, word)
 
-    def easy_words_push(self, word):
-        self.easy_words_edit.setText(word)
-        # word = self.easy_list[self.easyindex]
+    def words_list_push_end(self, name, word):
+        self.words_lists[name].append(word)
 
-    def familiar_words_push(self, word):
-        self.familiar_words_edit.setText(word)
-        # word = self.easy_list[self.easyindex]
+    def words_list2str(self, words_list):
+        words_str = ''
+        for word in words_list:
+            if word in self.words_lists[new_str]:
+                words_str += word + '\n'
+        return words_str
 
-    def difficult_words_push(self, word):
-        self.difficult_words_edit.setText(word)
-        # word = self.difficult_list[self.easyindex]
+    def export_words_file(self, dir_name, name_str):
+        file_path = dir_name + '/words_' + name_str + '.txt'
+        with open(file_path, 'w') as file_handler:
+            words_str = self.words_list2str(self.words_lists[name_str])
+            file_handler.write(words_str)
+
+    def export_words_files(self, dir_name):
+        print('[export_words_file] dir name: ', dir_name)
+        self.export_words_file(dir_name, error_str)
+        self.export_words_file(dir_name, easy_str)
+        self.export_words_file(dir_name, familiar_str)
+        self.export_words_file(dir_name, difficult_str)
 
     def export_btn(self):
         print('Export button click')
+        # Save words into dicts
+        # words_list2str(self.words_list)
+
+        dir_name = QFileDialog.getExistingDirectory(self,
+                                                    'Select export words path',
+                                                    '')
+        # print(dir_name)
+
+        if dir_name is not '':
+            print('Select export words path: ', dir_name)
+            # Do export operate
+            self.export_words_files(dir_name)
+        else:
+            print('Select words_path cancel')
 
     def dir_btn(self):
         print('Dir button click')
         dir_name = QFileDialog.getExistingDirectory(self,
-                                                    'Select word path',
+                                                    'Select words path',
                                                     '')
         # print(dir_name)
 
@@ -378,7 +436,6 @@ class Example(QWidget):
             self.words_path = dir_name
         else:
             print('Select words_path cancel')
-
 
     def about_btn(self):
         print('About button click')
@@ -398,7 +455,6 @@ class Example(QWidget):
     def difficult_line_edit_changed(self, text):
         print('difficult_line_edit_changed: ', text)
 
-
     def paintEvent(self, event):
         qp = QPainter()
         qp.begin(self)
@@ -407,7 +463,6 @@ class Example(QWidget):
         qp.end()
 
     def draw_lines(self, qp):
-
         pen = QPen(Qt.black, 2, Qt.SolidLine)
 
         pen.setStyle(Qt.CustomDashLine)

@@ -1,4 +1,3 @@
-
 # name string
 new_str = 'new'
 easy_str = 'easy'
@@ -6,7 +5,23 @@ familiar_str = 'familiar'
 difficult_str = 'difficult'
 error_str = 'error'
 
+
 # file_str_list = [new_str, easy_str, familiar_str, difficult_str, error_str]
+
+
+# def words_dict_pop(words_dict):
+#     word = list(words_dict)[0]
+#     num = words_dict[word]
+#
+#     return word, num
+#
+#
+# def words_dict_push(words_dict, word, num=0):
+#
+#
+#
+# def words_dict_sort(words_dict, mode=0):
+#     pass
 
 
 class WordsManager:
@@ -29,7 +44,7 @@ class WordsManager:
         print('check_files')
 
     def get_file_name(self, name_str):
-        file_path =  self.words_path + '/words_' + name_str + '.txt'
+        file_path = self.words_path + '/words_' + name_str + '.txt'
         return file_path
 
     @staticmethod
@@ -54,7 +69,7 @@ class WordsManager:
                 if pos_right_space == -1:
                     word_num = 0
                 else:
-                    word_num_str = word_line[pos_right_space+1:]
+                    word_num_str = word_line[pos_right_space + 1:]
                     if word_num_str.isdecimal() is True:
                         word_num = int(word_num_str)
                     else:
