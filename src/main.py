@@ -10,6 +10,7 @@ import pdf2txt
 import words_parser
 import words_manager
 
+WORK_MODE_IDLE = 'idle'
 WORK_MODE_CLASSIFY = 'classify'
 WORK_MODE_EDIT = 'edit'
 
@@ -38,16 +39,16 @@ class Example(QWidget):
     def __init__(self):
         super().__init__()
         self.words_path = '../words'
-        self.work_mode = WORK_MODE_CLASSIFY
+        self.work_mode = WORK_MODE_IDLE
 
         self.words_manager_inst = words_manager.WordsManager('../words')
 
         self.new_dict = dict()
-        # old words
-        self.error_dict = dict()
-        self.easy_dict = dict()
-        self.familiar_dict = dict()
-        self.difficult_dict = dict()
+        # # old words
+        # self.error_dict = dict()
+        # self.easy_dict = dict()
+        # self.familiar_dict = dict()
+        # self.difficult_dict = dict()
 
         self.words_lists = dict()
         self.words_lists[new_str] = []
@@ -57,11 +58,11 @@ class Example(QWidget):
         self.words_lists[familiar_str] = []
         self.words_lists[difficult_str] = []
 
-        self.words_dicts = dict()
-        self.words_dicts[error_str] = dict()
-        self.words_dicts[easy_str] = dict()
-        self.words_dicts[familiar_str] = dict()
-        self.words_dicts[difficult_str] = dict()
+        # self.words_dicts = dict()
+        # self.words_dicts[error_str] = dict()
+        # self.words_dicts[easy_str] = dict()
+        # self.words_dicts[familiar_str] = dict()
+        # self.words_dicts[difficult_str] = dict()
 
         print(self.words_lists[new_str])
 
@@ -70,6 +71,11 @@ class Example(QWidget):
         self.new_index = 0
 
         self.words_move_history = []
+
+        self.finished = True
+
+        # TODO: Load self.words_lists[new_str]
+        self.load_temp_data()
 
     def init_ui(self):
         self.text = "Test function"
@@ -92,16 +98,9 @@ class Example(QWidget):
         btn.resize(btn.sizeHint())
         btn.move(200, 0)
 
-        # btn = QPushButton('Setting', self)
-        # btn.clicked.connect(self.setting_btn)
-        # btn.setToolTip('Setting this software')
-        # btn.resize(btn.sizeHint())
-        # btn.move(300, 0)
-
-        btn = QPushButton('Dir', self)
-        btn.clicked.connect(self.dir_btn)
-        btn.setFocusPolicy(Qt.NoFocus)
-        btn.setToolTip('Set dir path')
+        btn = QPushButton('Setting', self)
+        btn.clicked.connect(self.setting_btn)
+        btn.setToolTip('Setting this software')
         btn.resize(btn.sizeHint())
         btn.move(300, 0)
 
@@ -142,8 +141,8 @@ class Example(QWidget):
         self.words_edits[error_str] = QLineEdit(self)
         # self.error_words_edit.setFocusPolicy(Qt.ClickFocus)
         # self.error_words_edit.setReadOnly(True)
-        self.words_edits[error_str].move(216, 300-150)
-        self.label.move(216 + 60, 280-150)
+        self.words_edits[error_str].move(216, 300-100)
+        self.label.move(216 + 60, 280-100)
         # self.error_words_edit.textChanged[str].connect(self.error_line_edit_changed)
 
         self.label = QLabel(self)
@@ -153,8 +152,8 @@ class Example(QWidget):
         self.words_edits[easy_str] = QLineEdit(self)
         # self.easy_words_edit.setFocusPolicy(Qt.ClickFocus)
         # self.easy_words_edit.setReadOnly(True)
-        self.words_edits[easy_str].move(216, 300+150)
-        self.label.move(216 + 60, 280+150)
+        self.words_edits[easy_str].move(216, 300+100)
+        self.label.move(216 + 60, 280+100)
         # self.easy_words_edit.textChanged[str].connect(self.easy_line_edit_changed)
 
         self.label = QLabel(self)
@@ -243,9 +242,14 @@ class Example(QWidget):
         if self.work_mode == WORK_MODE_CLASSIFY:
             self.work_mode_edit()
             self.work_mode = WORK_MODE_EDIT
-        else:
+        elif self.work_mode == WORK_MODE_EDIT:
             self.work_mode_classify()
             self.work_mode = WORK_MODE_CLASSIFY
+        elif self.work_mode == WORK_MODE_IDLE:
+            self.work_mode_edit()
+            self.work_mode = WORK_MODE_EDIT
+        else:
+            print('[WARNING] work_mode is invalid: ', self.work_mode)
 
         print('work_mode_switch: ', self.work_mode)
 
@@ -256,21 +260,23 @@ class Example(QWidget):
         if event.key() == Qt.Key_Tab:
             print('Key：Tab')
             self.work_mode_switch()
-        if event.key() == Qt.Key_W:
-            print('Key：Up')
-            self.word_move_to(error_str)
-        if event.key() == Qt.Key_S:
-            print('Key：Down')
-            self.word_move_to(easy_str)
-        if event.key() == Qt.Key_A:
-            print('Key：Left')
-            self.word_move_to(familiar_str)
-        if event.key() == Qt.Key_D:
-            print('Key：Right')
-            self.word_move_to(difficult_str)
-        if event.key() == Qt.Key_Backspace:
-            print('Key：Backspace')
-            self.word_move_back(self.words_move_history[-1])
+
+        if self.work_mode == WORK_MODE_CLASSIFY:
+            if event.key() == Qt.Key_W:
+                print('Key：Up')
+                self.word_move_to(error_str)
+            if event.key() == Qt.Key_S:
+                print('Key：Down')
+                self.word_move_to(easy_str)
+            if event.key() == Qt.Key_A:
+                print('Key：Left')
+                self.word_move_to(familiar_str)
+            if event.key() == Qt.Key_D:
+                print('Key：Right')
+                self.word_move_to(difficult_str)
+            if event.key() == Qt.Key_Backspace:
+                print('Key：Backspace')
+                self.word_move_back(self.words_move_history[-1])
 
         # if (event.key() == Qt.Key_Enter):
         #     print('测试：Space')
@@ -283,13 +289,21 @@ class Example(QWidget):
         #         print("p")
 
     def word_move_to(self, name):
-        word = self.words_edits[new_str].text()
-        self.words_list_push_end(name, word)
-        self.words_edits[name].setText(word)
-        self.new_index += 1
-        self.words_edits[new_str].setText(self.words_lists[new_str][self.new_index])
+        if self.new_index == len(self.words_lists[new_str]):
+            self.finished = True
+            print('...END...')
+        else:
+            word = self.words_edits[new_str].text()
+            self.words_list_push_end(name, word)
+            self.words_edits[name].setText(word)
+            self.new_index += 1
+            if self.new_index == len(self.words_lists[new_str]):
+                self.finished = True
+                self.words_edits[new_str].setText('...END...')
+            else:
+                self.words_edits[new_str].setText(self.words_lists[new_str][self.new_index])
 
-        self.words_move_history.append(name)
+            self.words_move_history.append(name)
 
     def word_move_back(self, name):
         if self.new_index <= 0:
@@ -330,14 +344,15 @@ class Example(QWidget):
             self.filter_words_new(words_file_name)
 
             self.new_dict = self.words_manager_inst.get_words_dict(new_str)
-            self.error_dict = self.words_manager_inst.get_words_dict(error_str)
-            self.easy_dict = self.words_manager_inst.get_words_dict(easy_str)
-            self.familiar_dict = self.words_manager_inst.get_words_dict(familiar_str)
-            self.difficult_dict = self.words_manager_inst.get_words_dict(difficult_str)
 
             self.new_index = 0
             self.words_lists[new_str] = list(self.new_dict.keys())
             self.words_edits[new_str].setText(self.words_lists[new_str][self.new_index])
+
+            self.work_mode_classify()
+            self.work_mode = WORK_MODE_CLASSIFY
+
+            self.finished = False
         else:
             print('Can not select pdf file')
 
@@ -395,7 +410,7 @@ class Example(QWidget):
         return words_str
 
     def export_words_file(self, dir_name, name_str):
-        file_path = dir_name + '/words_' + name_str + '.txt'
+        file_path = dir_name + '/export_' + name_str + '.txt'
         with open(file_path, 'w') as file_handler:
             words_str = self.words_list2str(self.words_lists[name_str])
             file_handler.write(words_str)
@@ -406,6 +421,46 @@ class Example(QWidget):
         self.export_words_file(dir_name, easy_str)
         self.export_words_file(dir_name, familiar_str)
         self.export_words_file(dir_name, difficult_str)
+
+    def get_words_dict(self, name_str):
+        # new_dict = self.words_manager_inst.get_words_dict(new_str)
+        words_dict = dict()
+        for word in self.words_lists[name_str]:
+            if word in self.new_dict:
+                words_dict[word] = self.new_dict[word]
+            else:
+                print('[WARNING] Can not find word(%s) in new dict' % word)
+
+        return words_dict
+
+    def save_words_into_file(self, dir_name, name_str):
+        file_path = dir_name + '/words_' + name_str + '.txt'
+        print('[save_words_into_files] file path: ', file_path)
+
+        if name_str == new_str:
+            self.words_lists[new_str] = self.words_lists[new_str][self.new_index:]
+            all_dict = self.get_words_dict(new_str)
+            print(all_dict)
+        else:
+            old_dict = self.words_manager_inst.get_words_dict(name_str)
+            now_dict = self.get_words_dict(name_str)
+            print('old_dict: ', old_dict)
+
+            all_dict = self.words_manager_inst.words_dict_add([old_dict, now_dict])
+            print('old_dict: ', old_dict)
+            print('now_dict: ', now_dict)
+            print('all_dict: ', all_dict)
+
+        order_dict = self.words_manager_inst.words_dict_sort(all_dict)
+        self.words_manager_inst.write_dict_to_words_file(name_str, order_dict)
+
+    def save_words_into_files(self, dir_name):
+        print('[save_words_into_files] dir name: ', dir_name)
+        self.save_words_into_file(dir_name, new_str)
+        self.save_words_into_file(dir_name, error_str)
+        self.save_words_into_file(dir_name, easy_str)
+        self.save_words_into_file(dir_name, familiar_str)
+        self.save_words_into_file(dir_name, difficult_str)
 
     def export_btn(self):
         print('Export button click')
@@ -419,23 +474,122 @@ class Example(QWidget):
 
         if dir_name is not '':
             print('Select export words path: ', dir_name)
-            # Do export operate
+
+            # Export files
             self.export_words_files(dir_name)
+
+            # Save files into words
+            self.save_words_into_files(self.words_path)
         else:
             print('Select words_path cancel')
 
-    def dir_btn(self):
-        print('Dir button click')
-        dir_name = QFileDialog.getExistingDirectory(self,
-                                                    'Select words path',
-                                                    '')
-        # print(dir_name)
+    def save_temp_words(self, name_str):
+        file_path = '../temp' + '/temp_' + name_str + '.txt'
+        print(file_path)
 
-        if dir_name is not '':
-            print('Select words_path: ', dir_name)
-            self.words_path = dir_name
-        else:
-            print('Select words_path cancel')
+        words_dict = self.get_words_dict(name_str)
+        print(words_dict)
+
+        order_dict = self.words_manager_inst.words_dict_sort(words_dict)
+        self.words_manager_inst.write_dict_to_temp_file(file_path, order_dict)
+
+    def save_temp_index(self):
+        file_path = '../temp' + '/temp_index.txt'
+        print(file_path)
+        with open(file_path, 'w') as file_handler:
+            file_handler.write(str(self.new_index))
+
+    def save_temp_data(self):
+        file_path = '../temp' + '/temp_data.txt'
+        print(file_path)
+        with open(file_path, 'w') as file_handler:
+            file_handler.write(str(self.finished))
+
+    def save_work_space(self):
+        self.save_temp_words(new_str)
+        self.save_temp_words(error_str)
+        self.save_temp_words(easy_str)
+        self.save_temp_words(familiar_str)
+        self.save_temp_words(difficult_str)
+        self.save_temp_index()
+
+    def setting_btn(self):
+        print('Setting button click')
+
+        # dir_name = QFileDialog.getExistingDirectory(self,
+        #                                             'Select words path',
+        #                                             '')
+        # # print(dir_name)
+        #
+        # if dir_name is not '':
+        #     print('Select words_path: ', dir_name)
+        #     self.words_path = dir_name
+        # else:
+        #     print('Select words_path cancel')
+
+    def load_temp_words_to_list(self, name_str):
+        file_path = '../temp' + '/temp_' + name_str + '.txt'
+        print(file_path)
+
+        words_dict = self.words_manager_inst.parse_words_dict(file_path)
+        print(words_dict)
+
+        self.words_lists[name_str] = list(words_dict.keys())
+        print(self.words_lists[name_str])
+
+    def load_temp_new_words_to_dict(self):
+        file_path = '../temp' + '/temp_new.txt'
+        print(file_path)
+
+        self.new_dict = self.words_manager_inst.parse_words_dict(file_path)
+
+    def load_temp_index(self):
+        file_path = '../temp' + '/temp_index.txt'
+        print(file_path)
+
+        with open(file_path, 'r') as file_handler:
+            new_index_str = file_handler.readline()
+            self.new_index = int(new_index_str)
+
+        print(self.new_index)
+
+    def load_temp_data(self):
+        file_path = '../temp' + '/temp_data.txt'
+        print(file_path)
+
+        with open(file_path, 'r') as file_handler:
+            data_str = file_handler.readline()
+            if data_str == 'True':
+                self.finished = True
+            elif data_str == 'False':
+                self.finished = False
+            else:
+                self.finished = True
+                print('[ERROR] data_str(%s) is invalid'%data_str)
+
+        print(self.finished)
+
+        if self.finished is False:
+            self.load_temp_words()
+
+    def load_temp_words(self):
+        print('load_temp_words')
+        # Test load
+        self.load_temp_words_to_list(new_str)
+        self.load_temp_words_to_list(error_str)
+        self.load_temp_words_to_list(easy_str)
+        self.load_temp_words_to_list(familiar_str)
+        self.load_temp_words_to_list(difficult_str)
+
+        self.load_temp_new_words_to_dict()
+        self.load_temp_index()
+
+        self.words_edits[new_str].setText(self.words_lists[new_str][self.new_index])
+
+        self.work_mode_classify()
+        self.work_mode = WORK_MODE_CLASSIFY
+
+        self.finished = False
 
     def about_btn(self):
         print('About button click')
@@ -454,6 +608,16 @@ class Example(QWidget):
 
     def difficult_line_edit_changed(self, text):
         print('difficult_line_edit_changed: ', text)
+
+    def closeEvent(self, event):
+        if self.finished is False:
+            self.save_work_space()
+            print('Save work space!')
+        else:
+            print('Work is done!')
+
+        self.save_temp_data()
+        print('Close...')
 
     def paintEvent(self, event):
         qp = QPainter()

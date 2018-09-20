@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 # name string
 new_str = 'new'
 easy_str = 'easy'
@@ -47,8 +49,7 @@ class WordsManager:
         file_path = self.words_path + '/words_' + name_str + '.txt'
         return file_path
 
-    @staticmethod
-    def parse_words_dict(file_name):
+    def parse_words_dict(self, file_name):
         words_dict = dict()
         with open(file_name, 'r+') as file_handler:
             words_lines = file_handler.readlines()
@@ -101,7 +102,7 @@ class WordsManager:
         elif dict_num == 1:
             return words_dict_list[0]
         else:
-            sum = words_dict_list[0]
+            sum = deepcopy(words_dict_list[0])
             for i in range(1, dict_num):
                 for key, value in words_dict_list[i].items():
                     num = sum.get(key)
@@ -127,7 +128,7 @@ class WordsManager:
         elif dict_num == 1:
             return words_dict_list[0]
         else:
-            res = words_dict_list[0]
+            res = deepcopy(words_dict_list[0])
             for i in range(1, dict_num):
                 for key, value in words_dict_list[i].items():
                     num = res.get(key)
@@ -136,6 +137,20 @@ class WordsManager:
                         res.pop(key)
         return res
 
+    def words_dict_sort(self, words_dict):
+        words_dict_order = dict()
+        words_list_order = sorted(words_dict.items(), key=lambda d: d[1], reverse=True)
+        # print(type(words_list_order))
+        print(words_list_order)
+
+        for word in words_list_order:
+            words_dict_order[word[0]] = word[1]
+
+        print(words_dict_order)
+
+        return words_dict_order
+
+
     def words_dict2str(self, words_dict):
         words_str = ''
         for word, num in words_dict.items():
@@ -143,9 +158,9 @@ class WordsManager:
             words_str += word.ljust(50) + str(num) + '\n'
         return words_str
 
-    def write_dict_to_file(self, words_name_str, words_dict):
+    def write_dict_to_words_file(self, words_name_str, words_dict):
         file_name = self.get_file_name(words_name_str)
-        print('write_dict_to_file: ', file_name)
+        print('write_dict_to_words_file: ', file_name)
         print(words_dict)
         with open(file_name, 'r+') as file_handler:
             words_str = self.words_dict2str(words_dict)
@@ -153,6 +168,13 @@ class WordsManager:
             file_handler.seek(0)
             file_handler.truncate()
             # print 'words_file: ', words_file.readlines()
+            file_handler.write(words_str)
+
+    def write_dict_to_temp_file(self, file_name, words_dict):
+        print('write_dict_to_file: ', file_name)
+        print(words_dict)
+        with open(file_name, 'w') as file_handler:
+            words_str = self.words_dict2str(words_dict)
             file_handler.write(words_str)
 
     def generate_new_words(self, file_name):
@@ -173,7 +195,7 @@ class WordsManager:
         print(self.words_dicts[new_str])
 
         # Write file
-        self.write_dict_to_file(new_str, self.words_dicts[new_str])
+        self.write_dict_to_words_file(new_str, self.words_dicts[new_str])
 
     def get_words_dict(self, name_str):
         return self.words_dicts[name_str]
