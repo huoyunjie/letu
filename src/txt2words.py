@@ -2,27 +2,16 @@ import os
 import sys
 import re
 
-WORDS_MODE = 1
-WORDS_NUM_MODE = 3
-
-# Experiment
-# man-uscript
-def words_preprocess(words):
-
-    words_list = []
-    for word in words:
-        word = word.lower()
-        words_list.append(word)
-
-    return words_list
+from global_cfg import *
+import words
 
 
-def words_counter(file_names_list):
+def words_counter(file_name_list):
     word_num_dict = {}
 
-    # print(file_names_list)
+    # print(file_txt_list)
 
-    for file_name in file_names_list:
+    for file_name in file_name_list:
         with open(file_name, encoding='UTF-8') as file_handler:
             file_str = file_handler.read()
             # print repr(file_str)
@@ -40,22 +29,22 @@ def words_counter(file_names_list):
 
     word_num_dict = sorted(word_num_dict.items(), key=lambda e:e[1], reverse=True)
 
-    # Do not need close file???
-
     return word_num_dict
 
-
-def words_file_generater(file_name, word_num_dict):
-    words_file = open(file_name, 'w')
-
-    # Optimize: use string to store
+def words_save_txt(file_name, word_num_dict):
+    with open(file_name, 'w') as file_handler:
+        for word, num in word_num_dict:
+            file_handler.write(word.ljust(50) + str(num) +'\n')
+    
+def words_save_json(file_name, word_num_dict):
+    new_group_list = []
     for word, num in word_num_dict:
-        # words_file.write(word+'\n')
-        words_file.write(word.ljust(50) + str(num) +'\n')
+        new_group_list.append(words.create_item(word, num))
 
-    words_file.close()
+    struct_inst = words.Struct()
+    struct_inst.add_group_raw(NEW_GROUP_NAME, new_group_list)
+    struct_inst.save(file_name)
 
-
-def process(in_file_names_list, out_file_name):
-    word_num_dict = words_counter(in_file_names_list)
-    words_file_generater(out_file_name, word_num_dict)
+def process(in_file_name_list, out_file_name):
+    word_num_dict = words_counter(in_file_name_list)
+    words_save_json(out_file_name, word_num_dict)

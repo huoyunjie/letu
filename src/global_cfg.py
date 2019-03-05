@@ -1,0 +1,45 @@
+
+# Group define
+NEW_GROUP_ID        = 0
+EASY_GROUP_ID       = 1
+FAMILIAR_GROUP_ID   = 2
+DIFFICULT_GROUP_ID  = 3
+ERROR_GROUP_ID      = 4
+
+NEW_GROUP_NAME       = 'new'
+EASY_GROUP_NAME      = 'easy'
+FAMILIAR_GROUP_NAME  = 'familiar'
+DIFFICULT_GROUP_NAME = 'difficult'
+ERROR_GROUP_NAME     = 'error'
+
+# DIR and FILE
+WORDS_DIR           = './words/'
+TEMP_DIR            = './temp/'
+WORDS_INPUT_FILE    = 'words_input.json'
+WORDS_FILE          = 'words.json'
+
+
+# UI
+# Window size
+MAIN_WINDOW_L_LEN       = 600
+MAIN_WINDOW_H_LEN       = 600
+
+# ToolBar
+TOOLBAR_H_POS           = 10
+TOOLBAR_L_START_POS     = 100
+TOOLBAR_L_STEP_LEN      = 100
+TOOLBAR_L_OPEN_POS      = TOOLBAR_L_START_POS
+TOOLBAR_L_EXPORT_POS    = TOOLBAR_L_OPEN_POS + TOOLBAR_L_STEP_LEN
+TOOLBAR_L_SETTING_POS   = TOOLBAR_L_EXPORT_POS + TOOLBAR_L_STEP_LEN
+TOOLBAR_L_ABOUT_POS     = TOOLBAR_L_SETTING_POS + TOOLBAR_L_STEP_LEN
+
+# Setting 
+# page range
+PAGE_RANGE_H_POS        = 80
+PAGE_RANGE_L_LABEL_POS  = 30
+PAGE_RANGE_L_EDIT_POS   = 160
+
+# LineEditor and Label
+# TODO:
+
+# UI END
