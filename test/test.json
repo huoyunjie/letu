@@ -1,0 +1,38 @@
+[
+    {
+        "easy": [
+            {
+                "word": "hello",
+                "number": 100,
+                "cn": "\u4f60\u597d",
+                "phonetic uk": "[h\u0259\u02c8l\u0259\u028a]",
+                "phonetic us": "[hel\u02c8\u014d]"
+            },
+            {
+                "word": "play",
+                "number": 85,
+                "cn": "\u73a9",
+                "phonetic uk": "[h\u0259\u02c8l\u0259\u028a]",
+                "phonetic us": "[hel\u02c8\u014d]"
+            }
+        ]
+    },
+    {
+        "error": [
+            {
+                "word": "hello",
+                "number": 100,
+                "cn": "\u4f60\u597d",
+                "phonetic uk": "[h\u0259\u02c8l\u0259\u028a]",
+                "phonetic us": "[hel\u02c8\u014d]"
+            },
+            {
+                "word": "play",
+                "number": 85,
+                "cn": "\u73a9",
+                "phonetic uk": "[h\u0259\u02c8l\u0259\u028a]",
+                "phonetic us": "[hel\u02c8\u014d]"
+            }
+        ]
+    }
+]
