@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from PyQt5.QtWidgets import QWidget, QApplication, QDesktopWidget, QPushButton, QToolTip, QFileDialog
+from PyQt5.QtWidgets import QWidget, QApplication, QDesktopWidget, QPushButton, QToolTip, QFileDialog, QMessageBox
 from PyQt5.QtWidgets import QLabel, QLineEdit
 from PyQt5.QtGui import QPainter, QColor, QFont, QCursor, QRegion, QIcon, QFont, QPen
 from PyQt5.QtCore import Qt, QPointF, QLineF
 
 import pdf2txt
 import txt2words
-import words_manager
 import words
 
 from global_cfg import *
@@ -27,19 +26,6 @@ class Example(QWidget):
     pdf_page_num = 0
     def __init__(self):
         super().__init__()
-        # self.words_manager_inst = words_manager.WordsManager('../words')
-
-        self.new_dict = dict()
-
-        self.words_lists = dict()
-        self.words_lists[new_str] = []
-        # new words
-        self.words_lists[error_str] = []
-        self.words_lists[easy_str] = []
-        self.words_lists[familiar_str] = []
-        self.words_lists[difficult_str] = []
-
-        print(self.words_lists[new_str])
 
         self.init_ui()
 
@@ -310,23 +296,33 @@ class Example(QWidget):
         self.words_input_inst.add_group(self.words_input[ERROR_GROUP_NAME])
         self.words_input_inst.save(TEMP_DIR + WORDS_INPUT_FILE)
 
+    def clean_worksapce(self):
+        self.words_input_inst.reset()
+        self.words_input_inst.save(TEMP_DIR + WORDS_INPUT_FILE)
+
     def load_workspace(self):
         self.load_words_input()
 
         if len(self.words_input[NEW_GROUP_NAME].get_list()):
-            print("[load_workspace] start from work space")
-            self.start_classify()
+            reply = QMessageBox.question(self,
+                                        "提示",
+                                        "继续上次工作?",
+                                        QMessageBox.Yes | QMessageBox.No)
+
+            if reply == QMessageBox.Yes:
+                print("[load_workspace] start from workspace")
+                self.start_classify()
+            else:
+                print("[load_workspace] Clean up workspace")
+                self.clean_worksapce()
         else:
             print("[load_workspace] work space is clean")
 
     def start_classify(self):
         item = self.words_input[NEW_GROUP_NAME].get_item_head()
         self.display_word(NEW_GROUP_NAME, item['word'])
-
         self.work_mode_classify()
-
         self.finished = False
-
 
     def open_btn(self):
         print('Open button click...')
@@ -435,13 +431,23 @@ class Example(QWidget):
 
     def closeEvent(self, event):
         if self.finished is False:
-            # TODO: pop Dialog to check
-            # self.save_worksapce()
-            print('Save work space!')
-        else:
-            print('Work is done!')
+            reply = QMessageBox.question(self,
+                                         "提示",
+                                         "保存工作区？",
+                                         QMessageBox.Yes | QMessageBox.No)
+            print(reply)
+            print(QMessageBox.Yes)
+            print(QMessageBox.No)
+            
 
-        print('Close...')
+            if reply == QMessageBox.Yes:
+                print("[closeEvent] Save workspace")
+                self.save_worksapce()
+            else:
+                print("[closeEvent] Do not save workspace")
+                self.clean_worksapce()
+        else:
+            print('[closeEvent] Work is done!')
 
     def paintEvent(self, event):
         qp = QPainter()
@@ -467,10 +473,6 @@ import os
 TEST_DIR = '../tmp/'
 
 def test_func():
-    # words_manager_inst = words_manager.WordsManager('../words')
-    # words_manager_inst.test()
-    # words_manager_inst.generate_new_words('../words/words.txt')
-
     file_pdf_name = TEST_DIR + 'input.pdf'
     file_txt_name = TEST_DIR + 'input.txt'
     file_json_name = TEST_DIR + 'input.json'
@@ -524,10 +526,10 @@ def test_func():
 
     
 if __name__ == '__main__':
-    print('Start...')
+    print('[main] Start...')
 
     # test_func()
 
     app_func()
 
-    print('End...')
+    print('[main] End...')

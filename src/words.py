@@ -17,7 +17,6 @@ def create_item(word = '', number = 0, cn = '', phonetic_uk = '', phonetic_us = 
 class Group(object):
 
     def __init__(self, group_name, group_list = []):
-        print('WordsStructure init...')
         self._name = group_name
         self._list = group_list
     
@@ -122,8 +121,14 @@ class Group(object):
 class Struct:
 
     def __init__(self):
-        print('WordsStructure init...')
         self.struct = {}
+        self.struct[NEW_GROUP_NAME] = Group(NEW_GROUP_NAME, [])
+        self.struct[EASY_GROUP_NAME] = Group(EASY_GROUP_NAME, [])
+        self.struct[FAMILIAR_GROUP_NAME] = Group(FAMILIAR_GROUP_NAME, [])
+        self.struct[DIFFICULT_GROUP_NAME] = Group(DIFFICULT_GROUP_NAME, [])
+        self.struct[ERROR_GROUP_NAME] = Group(ERROR_GROUP_NAME, [])
+
+    def reset(self):
         self.struct[NEW_GROUP_NAME] = Group(NEW_GROUP_NAME, [])
         self.struct[EASY_GROUP_NAME] = Group(EASY_GROUP_NAME, [])
         self.struct[FAMILIAR_GROUP_NAME] = Group(FAMILIAR_GROUP_NAME, [])
