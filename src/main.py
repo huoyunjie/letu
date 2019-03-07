@@ -260,10 +260,12 @@ class Example(QWidget):
                 self.display_word(NEW_GROUP_NAME, item['word'])
             else:
                 print('...END...')
+                self.finished = True
 
             self.word_move_history_push(name) 
         else:
             print('...END...')
+            self.finished = True
 
     def word_move_back(self):
         name = self.word_move_history_pop()
@@ -435,18 +437,15 @@ class Example(QWidget):
             self.save_worksapce()
             self.words_input_inst.save(file_name)
 
-
             # Save words_input into words
             # new group of words means the words can not be classified.
             # so you can load words and judge whether need to classify words continuely
-            self.words_inst.add_group(self.words[NEW_GROUP_NAME] + self.words_input[NEW_GROUP_NAME])
+            # self.words_inst.add_group(self.words[NEW_GROUP_NAME] + self.words_input[NEW_GROUP_NAME])
             self.words_inst.add_group(self.words[EASY_GROUP_NAME] + self.words_input[EASY_GROUP_NAME])
             self.words_inst.add_group(self.words[FAMILIAR_GROUP_NAME] + self.words_input[FAMILIAR_GROUP_NAME])
             self.words_inst.add_group(self.words[DIFFICULT_GROUP_NAME] + self.words_input[DIFFICULT_GROUP_NAME])
             self.words_inst.add_group(self.words[ERROR_GROUP_NAME] + self.words_input[ERROR_GROUP_NAME])
             self.words_inst.save(WORDS_DIR + 'words_xxx.json')    # FIXME: WORDS_DIR + WORDS_FILE
-
-            self.finished = True
         else:
             print('Export words is cancelled')
 
