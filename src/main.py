@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import sys
+import sys, os
 from PyQt5.QtWidgets import QWidget, QApplication, QDesktopWidget, QPushButton, QToolTip, QFileDialog, QMessageBox
 from PyQt5.QtWidgets import QLabel, QLineEdit
 from PyQt5.QtGui import QPainter, QColor, QFont, QCursor, QRegion, QIcon, QFont, QPen
@@ -29,16 +29,18 @@ class Example(QWidget):
 
         self.init_ui()
 
+        # Init values
         self.words_inst = words.Struct()
         self.words_input_inst = words.Struct()
         self.words = {}
         self.words_input = {}
-        self.load_words()
 
         self.word_move_history_init()
-
         self.finished = True
 
+        # check words.json and words_input.json
+        self.check_files()
+        self.load_words()
         self.load_workspace()
 
     def init_ui(self):
@@ -146,6 +148,31 @@ class Example(QWidget):
         cp = QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
+    
+    def check_files(self):
+        # Check words file
+        name = WORDS_DIR
+        if os.path.exists(name) is False:
+            print('[check_files] Can not find folder: ', name)
+            os.mkdir(name)
+        
+        name = name + WORDS_FILE
+        if os.path.exists(name) is False:
+            print('[check_files] Can not find file: ', name)
+            self.words_inst.reset()
+            self.words_inst.save(name)
+
+        # Check words_input file
+        name = TEMP_DIR
+        if os.path.exists(name) is False:
+            print('[check_files] Can not find folder: ', name)
+            os.mkdir(name)
+
+        name = name + WORDS_INPUT_FILE
+        if os.path.exists(name) is False:
+            print('[check_files] Can not find file: ', name)
+            self.words_inst.reset()
+            self.words_inst.save(name)
     
     def display_word(self, name, word):
          self.words_edits[name].setText(word)
@@ -435,10 +462,6 @@ class Example(QWidget):
                                          "提示",
                                          "保存工作区？",
                                          QMessageBox.Yes | QMessageBox.No)
-            print(reply)
-            print(QMessageBox.Yes)
-            print(QMessageBox.No)
-            
 
             if reply == QMessageBox.Yes:
                 print("[closeEvent] Save workspace")
