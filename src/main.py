@@ -314,9 +314,6 @@ class Example(QWidget):
         self.words_input[DIFFICULT_GROUP_NAME]  = self.words_input_inst.get_group(DIFFICULT_GROUP_NAME)
         self.words_input[ERROR_GROUP_NAME]      = self.words_input_inst.get_group(ERROR_GROUP_NAME)
 
-        # print(words_inst_group_easy.get_words_list())
-        # print(words_input_inst_group_new.get_words_list())
-
     def save_worksapce(self):
         self.words_input_inst.add_group(self.words_input[NEW_GROUP_NAME])
         self.words_input_inst.add_group(self.words_input[EASY_GROUP_NAME])
