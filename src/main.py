@@ -413,7 +413,6 @@ class Example(QWidget):
 
     def filter_input_words(self):
         words_input_inst_group_new = self.words_input[NEW_GROUP_NAME] - self.words[EASY_GROUP_NAME] - self.words[FAMILIAR_GROUP_NAME] - self.words[DIFFICULT_GROUP_NAME] - self.words[ERROR_GROUP_NAME]
-        # print(words_input_inst_group_new.get_words_list())
         self.words_input_inst.add_group(words_input_inst_group_new)
 
     def export_btn(self):
